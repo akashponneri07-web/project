@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Makes the page work properly on mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dragon Mouse Animation</title>
+
+    <style>
+
+        /* ==============================
+           BASIC PAGE SETUP
+        ============================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+
+            /* Background similar to the video */
+            background: #e8e6dc;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+    <!--
+        Canvas is where JavaScript will draw
+        the complete dragon.
+    -->
+    <canvas id="canvas"></canvas>
+
+
+    <script>
+
+        /* ==========================================
+           GET CANVAS
+        ========================================== */
+
+        const canvas = document.getElementById("canvas");
+
+        const ctx = canvas.getContext("2d");
+
+
+        /* ==========================================
+           CANVAS SIZE
+        ========================================== */
+
+        let width;
+        let height;
+
+
+        function resizeCanvas() {
+
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+
+        }
+
+
+        resizeCanvas();
+
+
+        window.addEventListener("resize", resizeCanvas);
+
+
+
+        /* ==========================================
+           MOUSE POSITION
+        ========================================== */
+
+        const mouse = {
+
+            x: width / 2,
+            y: height / 2
+
+        };
+
+
+        /* Mouse movement */
+
+        window.addEventListener("mousemove", function(event) {
+
+            mouse.x = event.clientX;
+            mouse.y = event.clientY;
+
+        });
+
+
+        /* ==========================================
+           TOUCH SUPPORT
+        ========================================== */
+
+        window.addEventListener("touchmove", function(event) {
+
+            mouse.x = event.touches[0].clientX;
+            mouse.y = event.touches[0].clientY;
+
+        });
+
+
+
+        /* ==========================================
+           DRAGON BODY
+        ========================================== */
+
+        const dragon = [];
+
+        /*
+            Number of body parts.
+
+            Increase this number to make
+            the dragon longer.
+        */
+
+        const BODY_LENGTH = 55;
+
+
+        /*
+            Create all body segments.
+        */
+
+        for (let i = 0; i < BODY_LENGTH; i++) {
+
+            dragon.push({
+
+                x: width / 2,
+
+                y: height / 2 + i * 7,
+
+                angle: 0,
+
+                size: 20 - i * 0.28
+
+            });
+
+        }
+
+
+
+        /* ==========================================
+           DRAW DRAGON BODY SEGMENT
+        ========================================== */
+
+        function drawBodySegment(segment, index) {
+
+            const x = segment.x;
+
+            const y = segment.y;
+
+            const angle = segment.angle;
+
+            const size = Math.max(segment.size, 4);
+
+
+            ctx.save();
+
+
+            /*
+                Move canvas origin to the
+                current body segment.
+            */
+
+            ctx.translate(x, y);
+
+
+            /*
+                Rotate the segment in the
+                direction the dragon is moving.
+            */
+
+            ctx.rotate(angle);
+
+
+
+            /* ======================================
+               BODY
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.ellipse(
+                0,
+                0,
+                size,
+                size * 0.45,
+                0,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fillStyle = "#444139";
+
+            ctx.fill();
+
+
+
+            /* ======================================
+               BODY CENTER LINE
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.moveTo(-size, 0);
+
+            ctx.lineTo(size, 0);
+
+            ctx.strokeStyle = "#1f1e1a";
+
+            ctx.lineWidth = 1;
+
+            ctx.stroke();
+
+
+
+            /* ======================================
+               TOP SPIKE
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.moveTo(0, -size * 0.25);
+
+            ctx.lineTo(
+                -size * 0.25,
+                -size * 1.25
+            );
+
+            ctx.lineTo(
+                size * 0.45,
+                -size * 0.25
+            );
+
+            ctx.closePath();
+
+            ctx.fillStyle = "#35332d";
+
+            ctx.fill();
+
+
+
+            /* ======================================
+               BOTTOM SPIKE
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.moveTo(0, size * 0.25);
+
+            ctx.lineTo(
+                -size * 0.2,
+                size * 1.0
+            );
+
+            ctx.lineTo(
+                size * 0.4,
+                size * 0.25
+            );
+
+            ctx.closePath();
+
+            ctx.fillStyle = "#35332d";
+
+            ctx.fill();
+
+
+
+            /* ======================================
+               WING / LONG SPIKE
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.moveTo(0, -size * 0.2);
+
+            ctx.quadraticCurveTo(
+
+                -size * 1.5,
+                -size * 2,
+
+                -size * 2.4,
+                -size * 2.2
+
+            );
+
+            ctx.strokeStyle = "#555249";
+
+            ctx.lineWidth = 1.2;
+
+            ctx.stroke();
+
+
+
+            /* ======================================
+               SECOND WING LINE
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.moveTo(0, -size * 0.1);
+
+            ctx.quadraticCurveTo(
+
+                -size * 1.8,
+                -size * 1.3,
+
+                -size * 2.8,
+                -size * 1.5
+
+            );
+
+            ctx.strokeStyle = "#555249";
+
+            ctx.lineWidth = 0.8;
+
+            ctx.stroke();
+
+
+
+            /* ======================================
+               RIGHT WING
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.moveTo(0, size * 0.1);
+
+            ctx.quadraticCurveTo(
+
+                size * 1.5,
+                size * 1.7,
+
+                size * 2.4,
+                size * 2.0
+
+            );
+
+            ctx.strokeStyle = "#555249";
+
+            ctx.lineWidth = 1;
+
+            ctx.stroke();
+
+
+
+            ctx.restore();
+
+        }
+
+
+
+        /* ==========================================
+           DRAW DRAGON HEAD
+        ========================================== */
+
+        function drawHead(x, y, angle) {
+
+            ctx.save();
+
+
+            /*
+                Move to head position
+            */
+
+            ctx.translate(x, y);
+
+
+            /*
+                Point head toward mouse
+            */
+
+            ctx.rotate(angle);
+
+
+
+            /* ======================================
+               NECK
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.moveTo(-25, -10);
+
+            ctx.quadraticCurveTo(
+                -40,
+                0,
+                -25,
+                10
+            );
+
+            ctx.fillStyle = "#35332d";
+
+            ctx.fill();
+
+
+
+            /* ======================================
+               HEAD
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.moveTo(25, 0);
+
+            ctx.lineTo(5, -17);
+
+            ctx.lineTo(-10, -12);
+
+            ctx.lineTo(-17, -4);
+
+            ctx.lineTo(-10, 0);
+
+            ctx.lineTo(-17, 5);
+
+            ctx.lineTo(-10, 12);
+
+            ctx.lineTo(5, 17);
+
+            ctx.closePath();
+
+            ctx.fillStyle = "#161512";
+
+            ctx.fill();
+
+
+
+            /* ======================================
+               HEAD HORN
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.moveTo(-2, -12);
+
+            ctx.lineTo(-8, -30);
+
+            ctx.lineTo(5, -16);
+
+            ctx.closePath();
+
+            ctx.fillStyle = "#292822";
+
+            ctx.fill();
+
+
+
+            /* ======================================
+               EYE
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.arc(
+                7,
+                -6,
+                2.5,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fillStyle = "#eeeeE4";
+
+            ctx.fill();
+
+
+
+            /* ======================================
+               LOWER JAW
+            ====================================== */
+
+            ctx.beginPath();
+
+            ctx.moveTo(5, 8);
+
+            ctx.lineTo(25, 3);
+
+            ctx.lineTo(13, 13);
+
+            ctx.closePath();
+
+            ctx.fillStyle = "#292822";
+
+            ctx.fill();
+
+
+
+            ctx.restore();
+
+        }
+
+
+
+        /* ==========================================
+           UPDATE DRAGON
+        ========================================== */
+
+        function updateDragon() {
+
+
+            /* ======================================
+               HEAD FOLLOWS MOUSE
+            ====================================== */
+
+            const head = dragon[0];
+
+
+            const dx = mouse.x - head.x;
+
+            const dy = mouse.y - head.y;
+
+
+            /*
+                Smooth movement.
+
+                Change 0.08 to:
+
+                0.03 = slower
+                0.15 = faster
+                0.30 = very fast
+            */
+
+            head.x += dx * 0.08;
+
+            head.y += dy * 0.08;
+
+
+            /*
+                Calculate head direction
+            */
+
+            head.angle = Math.atan2(dy, dx);
+
+
+
+            /* ======================================
+               BODY FOLLOWS HEAD
+            ====================================== */
+
+            for (
+                let i = 1;
+                i < dragon.length;
+                i++
+            ) {
+
+                const current = dragon[i];
+
+                const previous = dragon[i - 1];
+
+
+                const dx =
+                    previous.x - current.x;
+
+                const dy =
+                    previous.y - current.y;
+
+
+                const distance =
+                    Math.sqrt(
+                        dx * dx +
+                        dy * dy
+                    );
+
+
+                /*
+                    Space between body parts
+                */
+
+                const targetDistance = 8;
+
+
+                if (distance > targetDistance) {
+
+                    const angle =
+                        Math.atan2(dy, dx);
+
+
+                    current.x +=
+                        Math.cos(angle) *
+                        (distance - targetDistance) *
+                        0.45;
+
+
+                    current.y +=
+                        Math.sin(angle) *
+                        (distance - targetDistance) *
+                        0.45;
+
+                }
+
+
+                /*
+                    Body points toward
+                    previous segment.
+                */
+
+                current.angle =
+                    Math.atan2(
+                        previous.y - current.y,
+                        previous.x - current.x
+                    );
+
+            }
+
+        }
+
+
+
+        /* ==========================================
+           DRAW DRAGON
+        ========================================== */
+
+        function drawDragon() {
+
+
+            /*
+                Draw tail first.
+
+                Otherwise the front parts
+                would appear behind the tail.
+            */
+
+            for (
+                let i = dragon.length - 1;
+                i >= 1;
+                i--
+            ) {
+
+                drawBodySegment(
+                    dragon[i],
+                    i
+                );
+
+            }
+
+
+            /*
+                Draw head last.
+            */
+
+            drawHead(
+                dragon[0].x,
+                dragon[0].y,
+                dragon[0].angle
+            );
+
+        }
+
+
+
+        /* ==========================================
+           ANIMATION LOOP
+        ========================================== */
+
+        function animate() {
+
+
+            /*
+                Clear previous frame
+            */
+
+            ctx.clearRect(
+                0,
+                0,
+                width,
+                height
+            );
+
+
+            /*
+                Update dragon position
+            */
+
+            updateDragon();
+
+
+            /*
+                Draw dragon
+            */
+
+            drawDragon();
+
+
+            /*
+                Ask browser to run this
+                function again.
+            */
+
+            requestAnimationFrame(animate);
+
+        }
+
+
+
+        /* ==========================================
+           START ANIMATION
+        ========================================== */
+
+        animate();
+
+    </script>
+
+</body>
+
+</html>v
